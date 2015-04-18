@@ -22,11 +22,11 @@ systemctl restart mariadb.server
 mysql_secure_installation
 
 # agregar usuario para haproxy con accesado desde la red de richard
-mysql -u root -p -e "create user 'haproxy'@'192.168.51.%'; create user 'haproxy'@'localhost';"
+mysql -u root -p -e "create user 'haproxy'@'192.168.1.%'; create user 'haproxy'@'localhost';"
 
 # probar (local)
 echo 'provee el password de root de mysql'
 mysql -h 127.0.0.1 -u haproxy -e 'select @@hostname'
 
 # probar (remoto). Actualiza XX por la IP del haproxy
-# mysql -h 192.168.51.XX -u haproxy -e 'select @@hostname'
+# mysql -h 192.168.1.XX -u haproxy -e 'select @@hostname'
