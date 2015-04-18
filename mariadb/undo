@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# resetear firewalld
+systemctl restart firewalld.service
+
+# agregar usuario para haproxy con accesado desde la red de richard
+echo 'provee el password de root de mysql'
+mysql -u root -p -e "drop user 'haproxy'@'192.168.51.%'; drop user 'haproxy'@'localhost';"

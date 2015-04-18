@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# resetear firewalld
+systemctl restart firewalld.service 
+
+# remover gemas
+gem uninstall --force -ax rack tilt rack-protection sinatra eventmachine daemons thin 
+
+# borrar app
+rm myapp.rb
+
+# remover ruby y rubygems
+echo 'si quieres remover ruby y rubygems, ejecuta: 
+
+    dnf -y remove ruby rubygems'

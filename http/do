@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# resetear firewalld
+systemctl restart firewalld.service 
+
+# abrir puerto 8000 (agregar -P si es permanente)
+firewall-cmd --add-port=80/tcp
+firewall-cmd --add-port=8000/tcp
+
+# alternativa: agragar puerto con iptables. 
+# User -i para definir la interfaz, de ser posible
+# iptables -A INPUT -p tcp -m tcp --dport 80 -m conntrack --ctstate NEW -j ACCEPT
+
+
+# instalar ruby
+if [[ ! -f $( which ruby 2> /dev/null ) ]]; then 
+    dnf -y install ruby
+elif [[ ! -f $( which gem 2> /de   v/null ) ]]; then
+    dnf -y install rubygems
+fi
+
+# generar app
+cat << 'EOF' > myapp.rb
+#!/usr/bin/env ruby
+
+require 'sinatra'
+
+get '/' do
+    'Hola, mundo! Yo soy servidor 2'
+end
+EOF
+
+# instalar requerimientos
+cat << 'EOF' > ~/.gemrc
+gem: --no-document
+EOF
+
+if [[ ! -f $( which thin 2> /dev/null ) ]] || [[ ! -f $( which sinatra 2> /dev/null ) ]]; then
+    gem install sinatra thin || ( echo 'no se pudo instalar sinatra y/o thin' && exit 3 )
+fi
+
+# hacer ejecutable el webapp
+chmod 700 myapp.rb
+
+# correr en el puerto 8000
+sleep 2
+./myapp.rb -p 8000 -o 0.0.0.0

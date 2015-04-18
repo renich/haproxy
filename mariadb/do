@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# resetear firewalld
+systemctl restart firewalld.service
+
+# agregar la interfaz secundaria a la zona "internal" y abrir puerto 3306 (y 33060 si haproxy es local)
+firewall-cmd --zone=FedoraWorkstation --remove-interface=wlp2s0
+firewall-cmd --zone=internal --add-interface=wlp2s0
+firewall-cmd --zone=internal --add-port=3306/tcp
+firewall-cmd --zone=internal --add-port=33060/tcp
+
+# alternativamente: user iptables para abrir el puerto 33060. 
+# iptables -A INPUT -p tcp -m tcp --dport 33060 -m conntrack --ctstate NEW -j ACCEPT
+
+# instalar mariadb-server
+dnf -y install mariadb mariadb-server
+
+# correrlo (restart por si estaba corriendo)
+systemctl restart mariadb.server
+
+# asegurarlo (poner password de root, remover acceso remoto a root, etc)
+mysql_secure_installation
+
+# agregar usuario para haproxy con accesado desde la red de richard
+mysql -u root -p -e "create user 'haproxy'@'192.168.51.%'; create user 'haproxy'@'localhost';"
+
+# probar (local)
+echo 'provee el password de root de mysql'
+mysql -h 127.0.0.1 -u haproxy -e 'select @@hostname'
+
+# probar (remoto). Actualiza XX por la IP del haproxy
+# mysql -h 192.168.51.XX -u haproxy -e 'select @@hostname'
