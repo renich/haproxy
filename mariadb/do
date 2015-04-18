@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# checar si eres root
+if [[ 0 != $( id -u ) ]]; then
+    echo 'El script debe correrse con super poderes (root).'
+    exit 1
+fi
+
 # resetear firewalld
 systemctl restart firewalld.service
 
